@@ -26,6 +26,8 @@ public interface MainThreadSupport {
 
     Poster createPoster(EventBus eventBus);
 
+    Thrower createThrower(EventBus eventBus);
+
     class AndroidHandlerMainThreadSupport implements MainThreadSupport {
 
         private final Looper looper;
@@ -42,6 +44,11 @@ public interface MainThreadSupport {
         @Override
         public Poster createPoster(EventBus eventBus) {
             return new HandlerPoster(eventBus, looper, 10);
+        }
+
+        @Override
+        public Thrower createThrower(EventBus eventBus) {
+            return new HandlerThrower(eventBus, looper, 10);
         }
     }
 

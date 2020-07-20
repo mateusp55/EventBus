@@ -148,6 +148,18 @@ public class EventBus {
         }
     }
 
+    /**
+     * Registers the given handler to receive exceptional events. Handlers must call {@link #unregisterHandler(Object)} once they
+     * are no longer interested in receiving exceptional events.
+     * <p/>
+     * Handlers have exceptional event handling methods that must be annotated by {@link Handle}.
+     * The {@link Handle} annotation also allows configuration like {@link
+     * ExceptionalThreadMode} and priority.
+     */
+    public void registerHandler(Object subscriber) {
+
+    }
+
     // Must be called in synchronized block
     private void subscribe(Object subscriber, SubscriberMethod subscriberMethod) {
         Class<?> eventType = subscriberMethod.eventType;
@@ -251,6 +263,11 @@ public class EventBus {
         }
     }
 
+    /** Unregisters the given hendler from all exceptional event classes. */
+    public synchronized void unregisterHandler(Object handler) {
+
+    }
+
     /** Posts the given event to the event bus. */
     public void post(Object event) {
         PostingThreadState postingState = currentPostingThreadState.get();
@@ -307,6 +324,10 @@ public class EventBus {
         }
         // Should be posted after it is putted, in case the subscriber wants to remove immediately
         post(event);
+    }
+
+    public void throwsSticky(Object exceptionalEvent) {
+        //TODO
     }
 
     /**
@@ -505,6 +526,16 @@ public class EventBus {
         }
     }
 
+    /**
+     * Invokes the handler if the handlements is still active. Skipping handlements prevents race conditions
+     * between {@link #unregisterHandler(Object)} and exceptional event delivery. Otherwise the exceptional event might be delivered after the
+     * handler unregistered. This is particularly important for main thread delivery and registrations bound to the
+     * live cycle of an Activity or Fragment.
+     */
+    void invokeHandler(PendingThrow pendingThrow) {
+        //TODO
+    }
+
     void invokeSubscriber(Subscription subscription, Object event) {
         try {
             subscription.subscriberMethod.method.invoke(subscription.subscriber, event);
@@ -513,6 +544,10 @@ public class EventBus {
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("Unexpected exception", e);
         }
+    }
+
+    void invokeHandler(Handlement handlement, Object exceptionalEvent) {
+        //TODO
     }
 
     private void handleSubscriberException(Subscription subscription, Object event, Throwable cause) {
