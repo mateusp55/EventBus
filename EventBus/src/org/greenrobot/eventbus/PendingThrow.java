@@ -24,31 +24,31 @@ import java.util.List;
 final class PendingThrow {
     private final static List<PendingThrow> pendingThrowPool = new ArrayList<PendingThrow>();
 
-    Object event;
+    Object exceptionalEvent;
     Handlement handlement;
     PendingThrow next;
 
-    private PendingThrow(Object event, Handlement handlement) {
-        this.event = event;
+    private PendingThrow(Object exceptionalEvent, Handlement handlement) {
+        this.exceptionalEvent = exceptionalEvent;
         this.handlement = handlement;
     }
 
-    static PendingThrow obtainPendingThrow(Handlement handlement, Object event) {
+    static PendingThrow obtainPendingThrow(Handlement handlement, Object exceptionalEvent) {
         synchronized (pendingThrowPool) {
             int size = pendingThrowPool.size();
             if (size > 0) {
                 PendingThrow pendingThrow = pendingThrowPool.remove(size - 1);
-                pendingThrow.event = event;
+                pendingThrow.exceptionalEvent = exceptionalEvent;
                 pendingThrow.handlement = handlement;
                 pendingThrow.next = null;
                 return pendingThrow;
             }
         }
-        return new PendingThrow(event, handlement);
+        return new PendingThrow(exceptionalEvent, handlement);
     }
 
     static void releasePendingThrow(PendingThrow pendingThrow) {
-        pendingThrow.event = null;
+        pendingThrow.exceptionalEvent = null;
         pendingThrow.handlement = null;
         pendingThrow.next = null;
         synchronized (pendingThrowPool) {
