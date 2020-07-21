@@ -30,8 +30,8 @@ import java.util.logging.Level;
  * EventBus is a central publish/subscribe event system for Java and Android.
  * Events are posted ({@link #post(Object)}) to the bus, which delivers it to subscribers that have a matching handler
  * method for the event type.
- * To receive events, subscribers must register themselves to the bus using {@link #register(Object)}.
- * Once registered, subscribers receive events until {@link #unregister(Object)} is called.
+ * To receive events, subscribers must register themselves to the bus using {@link #registerSubscriber(Object)}.
+ * Once registered, subscribers receive events until {@link #unregisterSubscriber(Object)} is called.
  * Event handling methods must be annotated by {@link Subscribe}, must be public, return nothing (void),
  * and have exactly one parameter (the event).
  *
@@ -186,14 +186,23 @@ public class EventBus {
     }
 
     /**
-     * Registers the given subscriber to receive events. Subscribers must call {@link #unregister(Object)} once they
+     * Registers the given object to receive both events and exceptional events. Registered objects must call {@link #unregister(Object)} once they
+     * are no longer interested in receiving events and exceptional events.
+     */
+    public void register(Object object) {
+        registerSubscriber(object);
+        registerHandler(object);
+    }
+
+    /**
+     * Registers the given subscriber to receive events. Subscribers must call {@link #unregisterSubscriber(Object)} once they
      * are no longer interested in receiving events.
      * <p/>
      * Subscribers have event handling methods that must be annotated by {@link Subscribe}.
      * The {@link Subscribe} annotation also allows configuration like {@link
      * ThreadMode} and priority.
      */
-    public void register(Object subscriber) {
+    public void registerSubscriber(Object subscriber) {
         Class<?> subscriberClass = subscriber.getClass();
         List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
         synchronized (this) {
@@ -391,8 +400,14 @@ public class EventBus {
         }
     }
 
+    /** Unregisters the given object from all event and exceptional event classes. */
+    public synchronized void unregister(Object object) {
+        unregisterSubscriber(object);
+        unregisterHandler(object);
+    }
+
     /** Unregisters the given subscriber from all event classes. */
-    public synchronized void unregister(Object subscriber) {
+    public synchronized void unregisterSubscriber(Object subscriber) {
         List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
         if (subscribedTypes != null) {
             for (Class<?> eventType : subscribedTypes) {
@@ -886,7 +901,7 @@ public class EventBus {
 
     /**
      * Invokes the subscriber if the subscriptions is still active. Skipping subscriptions prevents race conditions
-     * between {@link #unregister(Object)} and event delivery. Otherwise the event might be delivered after the
+     * between {@link #unregisterSubscriber(Object)} and event delivery. Otherwise the event might be delivered after the
      * subscriber unregistered. This is particularly important for main thread delivery and registrations bound to the
      * live cycle of an Activity or Fragment.
      */
