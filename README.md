@@ -1,7 +1,7 @@
 EventBus
 ========
 [EventBus](https://greenrobot.org/eventbus/) is a publish/subscribe event bus for Android and Java.<br/>
-<img src="EventBus-Publish-Subscribe.png" width="500" height="187"/>
+<img src="EventBus-PubSub-ExceptionHandling.png" width="500" height="187"/>
 
 [![Build Status](https://travis-ci.org/greenrobot/EventBus.svg?branch=master)](https://travis-ci.org/greenrobot/EventBus)
 [![Follow greenrobot on Twitter](https://img.shields.io/twitter/follow/greenrobot_de.svg?style=flat-square&logo=twitter)](https://twitter.com/greenrobot_de)
@@ -18,7 +18,7 @@ EventBus...
  * is proven in practice by apps with 1,000,000,000+ installs
  * has advanced features like delivery threads, subscriber priorities, etc.
 
-EventBus in 3 steps
+EventBus (Normal Flow) in 3 steps
 -------------------
 1. Define events:
 
@@ -39,13 +39,21 @@ EventBus in 3 steps
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().registerSubscriber(this);
     }
- 
+   
     @Override
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregisterSubscriber(this);
+    }
+   
+   or
+ 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregisterSubscriber(this);
     }
     ```
 
@@ -55,6 +63,51 @@ EventBus in 3 steps
     EventBus.getDefault().post(new MessageEvent());
     ```
 
+EventBus (Exceptional Flow) in 3 steps
+-------------------
+1. Define exceptional events:
+
+    ```java  
+    public static class ExceptionalEvent { /* Additional fields if needed */ }
+    ```
+
+2. Prepare handlers:
+    Declare and annotate your handling method, optionally specify a exceptional thread mode:  
+
+    ```java
+    @Handle(threadMode = ExceptionalThreadMode.MAIN)  
+    public void onExceptionalEvent(ExceptionalEvent exceptionalEvent) {/* Do something */};
+    ```
+    Register and unregister your handler. For example on Android, activities and fragments should usually register according to their life cycle:
+
+   ```java
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().registerHandler(this);
+    }
+ 
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregisterHandler(this);
+    }
+   
+   or
+ 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregisterHandler(this);
+    }
+    ```
+
+3. Throw exceptional events:
+
+   ```java
+    EventBus.getDefault().throwsException(new ExceptionalEvent());
+    ```
+   
 Read the full [getting started guide](https://greenrobot.org/eventbus/documentation/how-to-get-started/).
 
 There are also some [examples](https://github.com/greenrobot-team/greenrobot-examples).
@@ -64,21 +117,34 @@ This will avoid some reflection related problems seen in the wild.
 
 Add EventBus to your project
 ----------------------------
-<a href="https://search.maven.org/search?q=g:org.greenrobot%20AND%20a:eventbus"><img src="https://img.shields.io/maven-central/v/org.greenrobot/eventbus.svg"></a>
-
-Available on <a href="https://search.maven.org/search?q=g:org.greenrobot%20AND%20a:eventbus">Maven Central</a>.
 
 Via Gradle:
 ```gradle
-implementation 'org.greenrobot:eventbus:3.2.0'
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+        implementation 'com.github.fabianojgf:EventBus:exception-handling-SNAPSHOT'
+}
 ```
 
 Via Maven:
 ```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
 <dependency>
-    <groupId>org.greenrobot</groupId>
-    <artifactId>eventbus</artifactId>
-    <version>3.2.0</version>
+    <groupId>com.github.fabianojgf</groupId>
+    <artifactId>EventBus</artifactId>
+    <version>exception-handling-SNAPSHOT</version>
 </dependency>
 ```
 
