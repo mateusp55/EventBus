@@ -1,7 +1,7 @@
 EventBus
 ========
 [EventBus](https://greenrobot.org/eventbus/) is a publish/subscribe event bus for Android and Java.<br/>
-<img src="EventBus-PubSub-ExceptionHandling.png" width="500" height="187"/>
+<img src="EventBus-PubSub-ExceptionHandling.png" width="100%"/>
 
 [![Build Status](https://travis-ci.org/greenrobot/EventBus.svg?branch=master)](https://travis-ci.org/greenrobot/EventBus)
 [![Follow greenrobot on Twitter](https://img.shields.io/twitter/follow/greenrobot_de.svg?style=flat-square&logo=twitter)](https://twitter.com/greenrobot_de)
