@@ -1334,6 +1334,7 @@ public class EventBus {
             for (SubscriberClass subscriberClass : subscriberClasses) {
                 Class<?> subscriberClassType = subscriberClass.subscriberClass;
                 Intent intent = new Intent(context, subscriberClassType);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
                 break;
             }
