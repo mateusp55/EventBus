@@ -32,6 +32,8 @@ import java.lang.annotation.Target;
 public @interface Handle {
     ExceptionalThreadMode threadMode() default ExceptionalThreadMode.THROWING;
 
+    ExceptionalActionMode actionMode() default ExceptionalActionMode.HANDLE;
+
     /**
      * If true, delivers the most recent sticky exceptional event (throwed with
      * {@link EventBus#throwsSticky(Object)}) to this handler (if exceptional event available).
@@ -44,4 +46,3 @@ public @interface Handle {
      * delivery among handlers with different {@link ExceptionalThreadMode}s! */
     int priority() default 0;
 }
-

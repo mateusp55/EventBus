@@ -25,16 +25,18 @@ import java.lang.reflect.Method;
 public class HandlerMethod {
     final Method method;
     final ExceptionalThreadMode threadMode;
+    final ExceptionalActionMode actionMode;
     final Class<?> exceptionalEventType;
     final int priority;
     final boolean sticky;
     /** Used for efficient comparison */
     String methodString;
 
-    public HandlerMethod(Method method, Class<?> exceptionalEventType, ExceptionalThreadMode threadMode, int priority, boolean sticky) {
+    public HandlerMethod(Method method, Class<?> exceptionalEventType, ExceptionalThreadMode threadMode, ExceptionalActionMode actionMode, int priority, boolean sticky) {
         this.method = method;
         this.threadMode = threadMode;
         this.exceptionalEventType = exceptionalEventType;
+        this.actionMode = actionMode;
         this.priority = priority;
         this.sticky = sticky;
     }

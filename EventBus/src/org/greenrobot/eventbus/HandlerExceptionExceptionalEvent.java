@@ -17,7 +17,7 @@ package org.greenrobot.eventbus;
 
 /**
  * This Exceptional Event is throwed by EventBus when an exception occurs inside a handler's exceptional event handling method.
- * 
+ *
  * @author Fabiano Gadelha
  */
 public final class HandlerExceptionExceptionalEvent {

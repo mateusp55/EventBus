@@ -17,7 +17,7 @@ package org.greenrobot.eventbus;
 
 /**
  * This Exceptional event is throwed by EventBus when no handler is found for a throwed exceptinal event.
- * 
+ *
  * @author Fabiano Gadelha
  */
 public final class NoHandlerExceptionalEvent {

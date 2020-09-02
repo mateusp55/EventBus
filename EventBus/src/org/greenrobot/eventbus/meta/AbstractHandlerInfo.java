@@ -16,9 +16,9 @@
 package org.greenrobot.eventbus.meta;
 
 import org.greenrobot.eventbus.EventBusException;
+import org.greenrobot.eventbus.ExceptionalActionMode;
 import org.greenrobot.eventbus.ExceptionalThreadMode;
 import org.greenrobot.eventbus.HandlerMethod;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.reflect.Method;
 
@@ -60,18 +60,18 @@ public abstract class AbstractHandlerInfo implements HandlerInfo {
     }
 
     protected HandlerMethod createHandlerMethod(String methodName, Class<?> eventType) {
-        return createHandlerMethod(methodName, eventType, ExceptionalThreadMode.THROWING, 0, false);
+        return createHandlerMethod(methodName, eventType, ExceptionalThreadMode.THROWING, ExceptionalActionMode.HANDLE, 0, false);
     }
 
-    protected HandlerMethod createHandlerMethod(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode) {
-        return createHandlerMethod(methodName, eventType, threadMode, 0, false);
+    protected HandlerMethod createHandlerMethod(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode, ExceptionalActionMode actionMode) {
+        return createHandlerMethod(methodName, eventType, threadMode, actionMode, 0, false);
     }
 
-    protected HandlerMethod createHandlerMethod(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode,
-                                                      int priority, boolean sticky) {
+    protected HandlerMethod createHandlerMethod(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode, ExceptionalActionMode actionMode,
+                                                int priority, boolean sticky) {
         try {
             Method method = handlerClass.getDeclaredMethod(methodName, eventType);
-            return new HandlerMethod(method, eventType, threadMode, priority, sticky);
+            return new HandlerMethod(method, eventType, threadMode, actionMode, priority, sticky);
         } catch (NoSuchMethodException e) {
             throw new EventBusException("Could not find handler method in " + handlerClass +
                     ". Maybe a missing ProGuard rule?", e);

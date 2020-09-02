@@ -48,6 +48,8 @@ public class EventBusBuilder {
     boolean throwHandlerException;
     boolean exceptionalEventInheritance = true;
 
+    boolean mappedClassesRegistrationPerformed = false;
+
     boolean ignoreGeneratedIndex;
     boolean strictMethodVerification;
     ExecutorService executorService = DEFAULT_EXECUTOR_SERVICE;
@@ -177,6 +179,16 @@ public class EventBusBuilder {
      */
 
     /**
+     * By default, EventBus considers that the registration of classes with methods for subscribe  or handle was not carried out.
+     * <p/>
+     * Registration will be performed during the first execution of {@link EventBus#post(Object)} or {@link EventBus#throwsException(Object)} methods.
+     */
+    public EventBusBuilder mappedClassesRegistrationPerformed(boolean mappedClassesRegistrationPerformed) {
+        this.mappedClassesRegistrationPerformed = mappedClassesRegistrationPerformed;
+        return this;
+    }
+
+    /**
      * Provide a custom thread pool to EventBus used for async and background event delivery. This is an advanced
      * setting to that can break things: ensure the given ExecutorService won't get stuck to avoid undefined behavior.
      */
@@ -287,7 +299,7 @@ public class EventBusBuilder {
 
     /** Builds an EventBus based on the current configuration. */
     public EventBus build() {
-        return new EventBus(this);
+        return new EventBus((EventBusBuilder) this);
     }
 
 }

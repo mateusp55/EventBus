@@ -43,7 +43,7 @@ public class TestRunnerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_runtests);
         textViewResult = findViewById(R.id.textViewResult);
-        controlBus = new EventBus();
+        controlBus = new EventBus(this);
         controlBus.register(this);
     }
 

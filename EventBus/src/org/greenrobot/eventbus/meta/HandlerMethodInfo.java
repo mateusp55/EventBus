@@ -15,30 +15,37 @@
  */
 package org.greenrobot.eventbus.meta;
 
+import org.greenrobot.eventbus.ExceptionalActionMode;
 import org.greenrobot.eventbus.ExceptionalThreadMode;
 
 public class HandlerMethodInfo {
     final String methodName;
     final ExceptionalThreadMode threadMode;
+    final ExceptionalActionMode actionMode;
     final Class<?> eventType;
     final int priority;
     final boolean sticky;
 
     public HandlerMethodInfo(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode,
-                             int priority, boolean sticky) {
+                             ExceptionalActionMode actionMode, int priority, boolean sticky) {
         this.methodName = methodName;
         this.threadMode = threadMode;
+        this.actionMode = actionMode;
         this.eventType = eventType;
         this.priority = priority;
         this.sticky = sticky;
     }
 
     public HandlerMethodInfo(String methodName, Class<?> eventType) {
-        this(methodName, eventType, ExceptionalThreadMode.THROWING, 0, false);
+        this(methodName, eventType, ExceptionalThreadMode.THROWING, ExceptionalActionMode.HANDLE,0, false);
     }
 
     public HandlerMethodInfo(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode) {
-        this(methodName, eventType, threadMode, 0, false);
+        this(methodName, eventType, threadMode, ExceptionalActionMode.HANDLE,0, false);
+    }
+
+    public HandlerMethodInfo(String methodName, Class<?> eventType, ExceptionalThreadMode threadMode, ExceptionalActionMode actionMode) {
+        this(methodName, eventType, threadMode, actionMode,0, false);
     }
 
 }

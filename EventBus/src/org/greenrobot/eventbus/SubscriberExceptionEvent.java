@@ -17,7 +17,7 @@ package org.greenrobot.eventbus;
 
 /**
  * This Event is posted by EventBus when an exception occurs inside a subscriber's event handling method.
- * 
+ *
  * @author Markus
  */
 public final class SubscriberExceptionEvent {
@@ -34,7 +34,7 @@ public final class SubscriberExceptionEvent {
     public final Object causingSubscriber;
 
     public SubscriberExceptionEvent(EventBus eventBus, Throwable throwable, Object causingEvent,
-            Object causingSubscriber) {
+                                    Object causingSubscriber) {
         this.eventBus = eventBus;
         this.throwable = throwable;
         this.causingEvent = causingEvent;

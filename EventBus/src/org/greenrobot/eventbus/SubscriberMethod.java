@@ -21,15 +21,17 @@ import java.lang.reflect.Method;
 public class SubscriberMethod {
     final Method method;
     final ThreadMode threadMode;
+    final ActionMode actionMode;
     final Class<?> eventType;
     final int priority;
     final boolean sticky;
     /** Used for efficient comparison */
     String methodString;
 
-    public SubscriberMethod(Method method, Class<?> eventType, ThreadMode threadMode, int priority, boolean sticky) {
+    public SubscriberMethod(Method method, Class<?> eventType, ThreadMode threadMode, ActionMode actionMode, int priority, boolean sticky) {
         this.method = method;
         this.threadMode = threadMode;
+        this.actionMode = actionMode;
         this.eventType = eventType;
         this.priority = priority;
         this.sticky = sticky;

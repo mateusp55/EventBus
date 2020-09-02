@@ -55,6 +55,20 @@ class HandlerMethodFinder {
         this.ignoreGeneratedIndex = ignoreGeneratedIndex;
     }
 
+    boolean hasHandlerMethods(Class<?> handlerClass) {
+        List<HandlerMethod> handlerMethods = METHOD_CACHE.get(handlerClass);
+        if (handlerMethods != null) {
+            return !handlerMethods.isEmpty();
+        }
+
+        if (ignoreGeneratedIndex) {
+            handlerMethods = findUsingReflection(handlerClass);
+        } else {
+            handlerMethods = findUsingInfo(handlerClass);
+        }
+        return !handlerMethods.isEmpty();
+    }
+
     List<HandlerMethod> findHandlerMethods(Class<?> handlerClass) {
         List<HandlerMethod> handlerMethods = METHOD_CACHE.get(handlerClass);
         if (handlerMethods != null) {
@@ -180,7 +194,8 @@ class HandlerMethodFinder {
                         Class<?> exceptionalEventType = parameterTypes[0];
                         if (findState.checkAdd(method, exceptionalEventType)) {
                             ExceptionalThreadMode threadMode = handleAnnotation.threadMode();
-                            findState.handlerMethods.add(new HandlerMethod(method, exceptionalEventType, threadMode,
+                            ExceptionalActionMode actionMode = handleAnnotation.actionMode();
+                            findState.handlerMethods.add(new HandlerMethod(method, exceptionalEventType, threadMode, actionMode,
                                     handleAnnotation.priority(), handleAnnotation.sticky()));
                         }
                     }

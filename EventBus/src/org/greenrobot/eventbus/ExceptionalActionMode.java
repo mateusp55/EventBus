@@ -16,20 +16,20 @@
 package org.greenrobot.eventbus;
 
 /**
- * This Event is posted by EventBus when no subscriber is found for a posted event.
+ * Each handler method has a exceptional action mode, which determines what
+ * type of action will be taken to execute the method.
  *
- * @author Markus
+ * @author Fabiano Gadelha
  */
-public final class NoSubscriberEvent {
-    /** The {@link EventBus} instance to with the original event was posted to. */
-    public final EventBus eventBus;
-
-    /** The original event that could not be delivered to any subscriber. */
-    public final Object originalEvent;
-
-    public NoSubscriberEvent(EventBus eventBus, Object originalEvent) {
-        this.eventBus = eventBus;
-        this.originalEvent = originalEvent;
-    }
-
+public enum ExceptionalActionMode {
+    /**
+     * This is default action, in which the method will receive the invocation and will be executed.
+     * However, the method will only be executed if the class instance is registered.
+     */
+    HANDLE,
+    /**
+     * This action causes the method to receive the invocation to be executed, even if there is no instance
+     * of the registered class. This action ensures that the class is initialized so that the method is executed.
+     */
+    START_AND_HANDLE
 }
