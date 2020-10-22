@@ -15,6 +15,8 @@
  */
 package org.greenrobot.eventbus;
 
+import android.app.Activity;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -1333,10 +1335,16 @@ public class EventBus {
         if (subscriberClasses != null && !subscriberClasses.isEmpty()) {
             for (SubscriberClass subscriberClass : subscriberClasses) {
                 Class<?> subscriberClassType = subscriberClass.subscriberClass;
-                Intent intent = new Intent(context, subscriberClassType);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-                break;
+
+                if(Activity.class.isAssignableFrom(subscriberClassType)) {
+                    Intent intent = new Intent(context, subscriberClassType);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+                else if(Service.class.isAssignableFrom(subscriberClassType)) {
+                    Intent intent = new Intent(context, subscriberClassType);
+                    context.startService(intent);
+                }
             }
             return true;
         }
@@ -1352,9 +1360,16 @@ public class EventBus {
             for (HandlerClass handlerClass : handlerClasses) {
                 if(handlerClass.handlerMethod.actionMode == ExceptionalActionMode.START_AND_HANDLE) {
                     Class<?> handlerClassType = handlerClass.handlerClass;
-                    Intent intent = new Intent(context, handlerClassType);
-                    context.startActivity(intent);
-                    //break;
+
+                    if(Activity.class.isAssignableFrom(handlerClassType)) {
+                        Intent intent = new Intent(context, handlerClassType);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                    else if(Service.class.isAssignableFrom(handlerClassType)) {
+                        Intent intent = new Intent(context, handlerClassType);
+                        context.startService(intent);
+                    }
                 }
             }
             return true;
