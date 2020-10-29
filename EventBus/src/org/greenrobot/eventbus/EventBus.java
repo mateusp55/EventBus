@@ -17,8 +17,6 @@ package org.greenrobot.eventbus;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -486,10 +484,6 @@ public class EventBus {
         return typesBySubscriber.containsKey(subscriber);
     }
 
-    public synchronized boolean isRegisteredHandler(Object handler) {
-        return typesByHandler.containsKey(handler);
-    }
-
     /** Only updates subscriptionsByEventType, not typesBySubscriber! Caller must update typesBySubscriber. */
     private void unsubscribeByEventType(Object subscriber, Class<?> eventType) {
         List<Subscription> subscriptions = subscriptionsByEventType.get(eventType);
@@ -604,14 +598,6 @@ public class EventBus {
         }
     }
 
-    public static boolean isIntentAvailable(Context ctx, Intent intent) {
-        final PackageManager mgr = ctx.getPackageManager();
-        List<ResolveInfo> list =
-                mgr.queryIntentActivities(intent,
-                        PackageManager.MATCH_DEFAULT_ONLY);
-        return list.size() > 0;
-    }
-
     public void registerMappedClasses() {
         if(mappedClassesRegistrationPerformed)
             return;
@@ -688,28 +674,6 @@ public class EventBus {
     }
 
     /**
-     * Called from a handler's exceptional event handling method, further exceptional event delivery will be canceled. Subsequent
-     * handlers won't receive the exceptional event. Exceptional events are usually canceled by higher priority handlers (see
-     * {@link Handle#priority()}). Canceling is restricted to exceptional event handling methods running in throwing thread
-     * {@link ExceptionalThreadMode#THROWING}.
-     */
-    public void cancelExceptionalEventDelivery(Object exceptionalEvent) {
-        ThrowingThreadState throwingState = currentImmediateThrowingThreadState.get();
-        if (!throwingState.isThrowing) {
-            throw new EventBusException(
-                    "This method may only be called from inside exceptional event handling methods on the throwing thread");
-        } else if (exceptionalEvent == null) {
-            throw new EventBusException("Exceptional event may not be null");
-        } else if (throwingState.exceptionalEvent != exceptionalEvent) {
-            throw new EventBusException("Only the currently handled exceptional event may be aborted");
-        } else if (throwingState.handlement.handlerMethod.threadMode != ExceptionalThreadMode.THROWING) {
-            throw new EventBusException(" exceptional event handlers may only abort the incoming exceptional event");
-        }
-
-        throwingState.canceled = true;
-    }
-
-    /**
      * Posts the given event to the event bus and holds on to the event (because it is sticky). The most recent sticky
      * event of an event's type is kept in memory for future access by subscribers using {@link Subscribe#sticky()}.
      */
@@ -745,35 +709,13 @@ public class EventBus {
     }
 
     /**
-     * Gets the most recent sticky exceptional event for the given type.
-     *
-     * @see #throwsSticky(Object)
-     */
-    public <T> T getStickyExceptionalEvent(Class<T> exceptionalEventType) {
-        synchronized (stickyExceptionalEvents) {
-            return exceptionalEventType.cast(stickyExceptionalEvents.get(exceptionalEventType));
-        }
-    }
-
-    /**
      * Remove and gets the recent sticky event for the given event type.
      *
      * @see #postSticky(Object)
      */
-    public <T> T removeStickyEvent(Class<T> eventType) {
+    public <T> void removeStickyEvent(Class<T> eventType) {
         synchronized (stickyEvents) {
-            return eventType.cast(stickyEvents.remove(eventType));
-        }
-    }
-
-    /**
-     * Remove and gets the recent sticky exceptional event for the given exceptional event type.
-     *
-     * @see #throwsSticky(Object)
-     */
-    public <T> T removeStickyExceptionalEvent(Class<T> exceptionalEventType) {
-        synchronized (stickyExceptionalEvents) {
-            return exceptionalEventType.cast(stickyExceptionalEvents.remove(exceptionalEventType));
+            stickyEvents.remove(eventType);
         }
     }
 
@@ -796,38 +738,11 @@ public class EventBus {
     }
 
     /**
-     * Removes the sticky exceptional event if it equals to the given exceptional event.
-     *
-     * @return true if the events matched and the sticky exceptional event was removed.
-     */
-    public boolean removeStickyExceptionalEvent(Object exceptionalEvent) {
-        synchronized (stickyExceptionalEvents) {
-            Class<?> exceptionalEventType = exceptionalEvent.getClass();
-            Object existingeExceptionalEvent = stickyExceptionalEvents.get(exceptionalEvent);
-            if (exceptionalEvent.equals(existingeExceptionalEvent)) {
-                stickyExceptionalEvents.remove(exceptionalEventType);
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    /**
      * Removes all sticky events.
      */
     public void removeAllStickyEvents() {
         synchronized (stickyEvents) {
             stickyEvents.clear();
-        }
-    }
-
-    /**
-     * Removes all sticky exceptional events.
-     */
-    public void removeAllExceptionalStickyEvents() {
-        synchronized (stickyExceptionalEvents) {
-            stickyExceptionalEvents.clear();
         }
     }
 
@@ -1021,68 +936,12 @@ public class EventBus {
         return subscriptionFound;
     }
 
-    public boolean hasHandlerForExceptionalEvent(Object exceptionalEvent) {
-        Class<?> exceptionalEventClass = exceptionalEvent.getClass();
-        boolean handlementFound = false;
-        if (exceptionalEventInheritance) {
-            List<Class<?>> exceptionalEventTypes = lookupAllExceptionalEventTypes(exceptionalEventClass);
-            int countTypes = exceptionalEventTypes.size();
-            for (int h = 0; h < countTypes; h++) {
-                Class<?> clazz = exceptionalEventTypes.get(h);
-                handlementFound |= hasHandlementForExceptionalEventType(clazz);
-            }
-        } else {
-            handlementFound = hasHandlementForExceptionalEventType(exceptionalEventClass);
-        }
-        return handlementFound;
-    }
-
     private boolean hasSubscriptionForEventType(Class<?> eventClass) {
         CopyOnWriteArrayList<Subscription> subscriptions;
         synchronized (this) {
             subscriptions = subscriptionsByEventType.get(eventClass);
             return subscriptions != null && !subscriptions.isEmpty();
         }
-    }
-
-    private boolean hasHandlementForExceptionalEventType(Class<?> exceptionalEventClass) {
-        CopyOnWriteArrayList<Handlement> handlements;
-        synchronized (this) {
-            handlements = handlementsByExceptionalEventType.get(exceptionalEventClass);
-            return handlements != null && !handlements.isEmpty();
-        }
-    }
-
-    public boolean hasSubscriberClassForEvent(Object event) {
-        Class<?> eventClass = event.getClass();
-        boolean subscriptionFound = false;
-        if (eventInheritance) {
-            List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
-            int countTypes = eventTypes.size();
-            for (int h = 0; h < countTypes; h++) {
-                Class<?> clazz = eventTypes.get(h);
-                subscriptionFound |= hasSubscriptionClassForEventType(clazz);
-            }
-        } else {
-            subscriptionFound = hasSubscriptionClassForEventType(eventClass);
-        }
-        return subscriptionFound;
-    }
-
-    public boolean hasHandlerClassForExceptionalEvent(Object exceptionalEvent) {
-        Class<?> exceptionalEventClass = exceptionalEvent.getClass();
-        boolean handlementFound = false;
-        if (exceptionalEventInheritance) {
-            List<Class<?>> exceptionalEventTypes = lookupAllExceptionalEventTypes(exceptionalEventClass);
-            int countTypes = exceptionalEventTypes.size();
-            for (int h = 0; h < countTypes; h++) {
-                Class<?> clazz = exceptionalEventTypes.get(h);
-                handlementFound |= hasHandlementClassForExceptionalEventType(clazz);
-            }
-        } else {
-            handlementFound = hasHandlementClassForExceptionalEventType(exceptionalEventClass);
-        }
-        return handlementFound;
     }
 
     private boolean hasSubscriptionClassForEventType(Class<?> eventClass) {
