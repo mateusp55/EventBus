@@ -180,11 +180,11 @@ public class EventBus {
     /**
      * Creates a new EventBus instance; each instance is a separate scope in which events are delivered. To use a
      * central bus, consider {@link #getDefault()}.
+     */
 
      public EventBus() {
      this((Context) null);
      }
-     */
 
     public EventBus(android.content.Context context) {
         this(DEFAULT_BUILDER);
