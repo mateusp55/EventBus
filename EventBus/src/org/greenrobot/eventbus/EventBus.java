@@ -946,22 +946,6 @@ public class EventBus {
         }
     }
 
-    private boolean hasSubscriptionClassForEventType(Class<?> eventClass) {
-        CopyOnWriteArrayList<SubscriberClass> subscriberClasses;
-        synchronized (this) {
-            subscriberClasses = subscriberClassesByEventType.get(eventClass);
-            return subscriberClasses != null && !subscriberClasses.isEmpty();
-        }
-    }
-
-    private boolean hasHandlementClassForExceptionalEventType(Class<?> exceptionalEventClass) {
-        CopyOnWriteArrayList<HandlerClass> handlerClasses;
-        synchronized (this) {
-            handlerClasses = handlerClassesByExceptionalEventType.get(exceptionalEventClass);
-            return handlerClasses != null && !handlerClasses.isEmpty();
-        }
-    }
-
     private boolean isSubscriberForEvent(Object subscriber, Object event) {
         Class<?> eventClass = event.getClass();
         Class<?> subscriberClass = subscriber.getClass();
@@ -1017,68 +1001,6 @@ public class EventBus {
             if(handlements != null && !handlements.isEmpty()) {
                 for(Handlement handlement : handlements) {
                     if(handlement.handler.getClass().equals(handlerClass))
-                        return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    private boolean isSubscriberClassForEvent(Object subscriber, Object event) {
-        Class<?> eventClass = event.getClass();
-        Class<?> subscriberClass = subscriber.getClass();
-        boolean subscriptionFound = false;
-        if (eventInheritance) {
-            List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
-            int countTypes = eventTypes.size();
-            for (int h = 0; h < countTypes; h++) {
-                Class<?> clazz = eventTypes.get(h);
-                subscriptionFound |= isSubscriberClassForEventType(subscriberClass, clazz);
-            }
-        } else {
-            subscriptionFound = isSubscriberClassForEventType(subscriberClass, eventClass);
-        }
-        return subscriptionFound;
-    }
-
-    private boolean isHandlerClassForExceptionalEvent(Object handler, Object exceptionalEvent) {
-        Class<?> exceptionalEventClass = exceptionalEvent.getClass();
-        Class<?> handlerClass = handler.getClass();
-        boolean handlementFound = false;
-        if (exceptionalEventInheritance) {
-            List<Class<?>> exceptionalEventTypes = lookupAllExceptionalEventTypes(exceptionalEventClass);
-            int countTypes = exceptionalEventTypes.size();
-            for (int h = 0; h < countTypes; h++) {
-                Class<?> clazz = exceptionalEventTypes.get(h);
-                handlementFound |= isHandlerClassForExceptionalEventType(handlerClass, clazz);
-            }
-        } else {
-            handlementFound = isHandlerClassForExceptionalEventType(handlerClass, exceptionalEventClass);
-        }
-        return handlementFound;
-    }
-
-    private boolean isSubscriberClassForEventType(Class<?> subscriberClassType, Class<?> eventClass) {
-        CopyOnWriteArrayList<SubscriberClass> subscriberClasses;
-        synchronized (this) {
-            subscriberClasses = subscriberClassesByEventType.get(eventClass);
-            if(subscriberClasses != null && !subscriberClasses.isEmpty()) {
-                for(SubscriberClass subscriberClass : subscriberClasses) {
-                    if(subscriberClass.subscriberClass.equals(subscriberClassType))
-                        return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    private boolean isHandlerClassForExceptionalEventType(Class<?> handlerClassType, Class<?> exceptionalEventClass) {
-        CopyOnWriteArrayList<HandlerClass> handlerClasses;
-        synchronized (this) {
-            handlerClasses = handlerClassesByExceptionalEventType.get(exceptionalEventClass);
-            if(handlerClasses != null && !handlerClasses.isEmpty()) {
-                for(HandlerClass handlerClass : handlerClasses) {
-                    if(handlerClass.handlerClass.equals(handlerClassType))
                         return true;
                 }
             }
@@ -1158,35 +1080,33 @@ public class EventBus {
 
     private void prepareLatePostingEvent(Object event) throws Error {
         Class<?> eventClass = event.getClass();
-        boolean subscriberClassFound = false;
         if (eventInheritance) {
             List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
             int countTypes = eventTypes.size();
             for (int h = 0; h < countTypes; h++) {
                 Class<?> clazz = eventTypes.get(h);
-                subscriberClassFound |= prepareLatePostingEventForEventType(event, clazz);
+                prepareLatePostingEventForEventType(clazz);
             }
         } else {
-            subscriberClassFound = prepareLatePostingEventForEventType(event, eventClass);
+            prepareLatePostingEventForEventType(eventClass);
         }
     }
 
     private void prepareLateThrowingExceptionalEvent(Object exceptionalEvent) throws Error {
         Class<?> exceptionalEventClass = exceptionalEvent.getClass();
-        boolean handlerClassFound = false;
         if (exceptionalEventInheritance) {
             List<Class<?>> exceptionalEventTypes = lookupAllExceptionalEventTypes(exceptionalEventClass);
             int countTypes = exceptionalEventTypes.size();
             for (int h = 0; h < countTypes; h++) {
                 Class<?> clazz = exceptionalEventTypes.get(h);
-                handlerClassFound |= prepareLateThrowingExceptionalEventForExceptionalEventType(exceptionalEvent, clazz);
+                prepareLateThrowingExceptionalEventForExceptionalEventType(clazz);
             }
         } else {
-            handlerClassFound = prepareLateThrowingExceptionalEventForExceptionalEventType(exceptionalEvent, exceptionalEventClass);
+            prepareLateThrowingExceptionalEventForExceptionalEventType(exceptionalEventClass);
         }
     }
 
-    private boolean prepareLatePostingEventForEventType(Object event, Class<?> eventClass) {
+    private void prepareLatePostingEventForEventType(Class<?> eventClass) {
         CopyOnWriteArrayList<SubscriberClass> subscriberClasses;
         synchronized (this) {
             subscriberClasses = subscriberClassesByEventType.get(eventClass);
@@ -1205,12 +1125,10 @@ public class EventBus {
                     context.startService(intent);
                 }
             }
-            return true;
         }
-        return false;
     }
 
-    private boolean prepareLateThrowingExceptionalEventForExceptionalEventType(Object exceptionalEvent, Class<?> exceptionalEventClass) {
+    private void prepareLateThrowingExceptionalEventForExceptionalEventType(Class<?> exceptionalEventClass) {
         CopyOnWriteArrayList<HandlerClass> handlerClasses;
         synchronized (this) {
             handlerClasses = handlerClassesByExceptionalEventType.get(exceptionalEventClass);
@@ -1231,9 +1149,7 @@ public class EventBus {
                     }
                 }
             }
-            return true;
         }
-        return false;
     }
 
     /** Looks up all Class objects including super classes and interfaces. Should also work for interfaces. */
@@ -1394,10 +1310,6 @@ public class EventBus {
         Object event;
         boolean canceled;
 
-        public PostingThreadState() {
-            super();
-        }
-
         public PostingThreadState(boolean isLate) {
             super();
             this.isLate = isLate;
@@ -1414,10 +1326,6 @@ public class EventBus {
         Object exceptionalEvent;
         boolean canceled;
 
-        public ThrowingThreadState() {
-            super();
-        }
-
         public ThrowingThreadState(boolean isLate) {
             super();
             this.isLate = isLate;
@@ -1433,16 +1341,6 @@ public class EventBus {
      */
     public Logger getLogger() {
         return logger;
-    }
-
-    // Just an idea: we could provide a callback to post() to be notified, an alternative would be events, of course...
-    /* public */interface PostCallback {
-        void onPostCompleted(List<SubscriberExceptionEvent> exceptionEvents);
-    }
-
-    // Just an idea: we could provide a callback to throws() to be notified, an alternative would be exceptional events, of course...
-    /* public */interface ThrowsCallback {
-        void onThrowsCompleted(List<HandlerExceptionExceptionalEvent> exceptionExceptionalEvents);
     }
 
     @Override
