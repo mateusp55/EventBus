@@ -56,6 +56,31 @@ EventBus (Normal Flow) in 3 steps
         EventBus.getDefault().unregisterSubscriber(this);
     }
     ```
+    
+    On Android services, register and unregister according to their life cycle as well:
+
+   ```java
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        EventBus.getDefault(this).registerHandler(this);
+    }
+    
+    or
+    
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int value = super.onStartCommand(intent, flags, startId);
+        EventBus.getDefault(this).registerHandler(this);
+        return value;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault(this).unregisterHandler(this);
+    }
+    ```
 
 3. Post events:
 
@@ -99,6 +124,31 @@ EventBus (Exceptional Flow) in 3 steps
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregisterHandler(this);
+    }
+    ```
+    
+    On Android services, register and unregister according to their life cycle as well:
+
+   ```java
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        EventBus.getDefault(this).registerHandler(this);
+    }
+    
+    or
+    
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int value = super.onStartCommand(intent, flags, startId);
+        EventBus.getDefault(this).registerHandler(this);
+        return value;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault(this).unregisterHandler(this);
     }
     ```
 
