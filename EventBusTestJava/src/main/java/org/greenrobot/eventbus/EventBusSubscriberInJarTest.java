@@ -25,7 +25,7 @@ public class EventBusSubscriberInJarTest {
     @Test
     public void testSubscriberInJar() {
         SubscriberInJar subscriber = new SubscriberInJar();
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
         eventBus.post("Hi Jar");
         eventBus.post(42);
         Assert.assertEquals(1, subscriber.getCollectedStrings().size());

@@ -29,7 +29,7 @@ public class EventBusBackgroundThreadTest extends AbstractAndroidEventBusTest {
 
     @Test
     public void testPostInCurrentThread() throws InterruptedException {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         eventBus.post("Hello");
         waitForEventCount(1, 1000);
 
@@ -39,7 +39,7 @@ public class EventBusBackgroundThreadTest extends AbstractAndroidEventBusTest {
 
     @Test
     public void testPostFromMain() throws InterruptedException {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         postInMainThread("Hello");
         waitForEventCount(1, 1000);
         assertEquals("Hello", lastEvent);

@@ -29,8 +29,8 @@ public class EventBusBuilderTest extends AbstractEventBusTest {
     @Test
     public void testThrowSubscriberException() {
         eventBus = EventBus.builder().throwSubscriberException(true).build();
-        eventBus.register(new SubscriberExceptionEventTracker());
-        eventBus.register(new ThrowingSubscriber());
+        eventBus.registerSubscriber(new SubscriberExceptionEventTracker());
+        eventBus.registerSubscriber(new ThrowingSubscriber());
         try {
             eventBus.post("Foo");
             fail("Should have thrown");
@@ -42,8 +42,8 @@ public class EventBusBuilderTest extends AbstractEventBusTest {
     @Test
     public void testDoNotSendSubscriberExceptionEvent() {
         eventBus = EventBus.builder().logSubscriberExceptions(false).sendSubscriberExceptionEvent(false).build();
-        eventBus.register(new SubscriberExceptionEventTracker());
-        eventBus.register(new ThrowingSubscriber());
+        eventBus.registerSubscriber(new SubscriberExceptionEventTracker());
+        eventBus.registerSubscriber(new ThrowingSubscriber());
         eventBus.post("Foo");
         assertEventCount(0);
     }
@@ -51,7 +51,7 @@ public class EventBusBuilderTest extends AbstractEventBusTest {
     @Test
     public void testDoNotSendNoSubscriberEvent() {
         eventBus = EventBus.builder().logNoSubscriberMessages(false).sendNoSubscriberEvent(false).build();
-        eventBus.register(new NoSubscriberEventTracker());
+        eventBus.registerSubscriber(new NoSubscriberEventTracker());
         eventBus.post("Foo");
         assertEventCount(0);
     }
@@ -75,7 +75,7 @@ public class EventBusBuilderTest extends AbstractEventBusTest {
     @Test
     public void testEventInheritance() {
         eventBus = EventBus.builder().eventInheritance(false).build();
-        eventBus.register(new ThrowingSubscriber());
+        eventBus.registerSubscriber(new ThrowingSubscriber());
         eventBus.post("Foo");
     }
 

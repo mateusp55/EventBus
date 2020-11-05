@@ -70,7 +70,7 @@ public class EventBusMultithreadedTest extends AbstractEventBusTest {
 
     private void runThreadsSingleEventType(int threadCount) throws InterruptedException {
         int iterations = COUNT / threadCount;
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
 
         CountDownLatch latch = new CountDownLatch(threadCount + 1);
         List<PosterThread> threads = startThreads(latch, threadCount, iterations, "Hello");
@@ -91,7 +91,7 @@ public class EventBusMultithreadedTest extends AbstractEventBusTest {
     }
 
     void runThreadsMixedEventType(int count, int threadCount) throws InterruptedException {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         int eventTypeCount = 3;
         int iterations = count / threadCount / eventTypeCount;
 

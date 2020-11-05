@@ -29,7 +29,7 @@ public class EventBusMethodModifiersTest extends AbstractAndroidEventBusTest {
 
     @Test
     public void testRegisterForEventTypeAndPost() throws InterruptedException {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         String event = "Hello";
         eventBus.post(event);
         waitForEventCount(4, 1000);

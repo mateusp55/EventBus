@@ -83,7 +83,7 @@ public class EventBusFallbackToReflectionTest extends AbstractEventBusTest {
                 trackEvent(event);
             }
         };
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
 
         eventBus.post("Hello");
         assertEquals("Hello", lastEvent);
@@ -98,7 +98,7 @@ public class EventBusFallbackToReflectionTest extends AbstractEventBusTest {
                 trackEvent(event);
             }
         };
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
 
         eventBus.post("Hello");
         assertEquals("Hello", lastEvent);
@@ -107,7 +107,7 @@ public class EventBusFallbackToReflectionTest extends AbstractEventBusTest {
 
     @Test
     public void testAnonymousSubscriberClassWithPrivateSuperclass() {
-        eventBus.register(new PublicWithPrivateSuperClass());
+        eventBus.registerSubscriber(new PublicWithPrivateSuperClass());
         eventBus.post("Hello");
         assertEquals("Hello", lastEvent);
         assertEquals(2, eventsReceived.size());
@@ -115,7 +115,7 @@ public class EventBusFallbackToReflectionTest extends AbstractEventBusTest {
 
     @Test
     public void testSubscriberClassWithPrivateEvent() {
-        eventBus.register(new PublicClassWithPrivateEvent());
+        eventBus.registerSubscriber(new PublicClassWithPrivateEvent());
         PrivateEvent privateEvent = new PrivateEvent();
         eventBus.post(privateEvent);
         assertEquals(privateEvent, lastEvent);
@@ -124,7 +124,7 @@ public class EventBusFallbackToReflectionTest extends AbstractEventBusTest {
 
     @Test
     public void testSubscriberClassWithPublicAndPrivateEvent() {
-        eventBus.register(new PublicClassWithPublicAndPrivateEvent());
+        eventBus.registerSubscriber(new PublicClassWithPublicAndPrivateEvent());
 
         eventBus.post("Hello");
         assertEquals("Hello", lastEvent);
@@ -138,7 +138,7 @@ public class EventBusFallbackToReflectionTest extends AbstractEventBusTest {
 
     @Test
     public void testSubscriberExtendingClassWithPrivateEvent() {
-        eventBus.register(new PublicWithPrivateEventInSuperclass());
+        eventBus.registerSubscriber(new PublicWithPrivateEventInSuperclass());
         PrivateEvent privateEvent = new PrivateEvent();
         eventBus.post(privateEvent);
         assertEquals(privateEvent, lastEvent);

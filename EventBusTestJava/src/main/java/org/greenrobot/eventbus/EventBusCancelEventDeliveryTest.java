@@ -30,22 +30,22 @@ public class EventBusCancelEventDeliveryTest extends AbstractEventBusTest {
     @Test
     public void testCancel() {
         Subscriber canceler = new Subscriber(1, true);
-        eventBus.register(new Subscriber(0, false));
-        eventBus.register(canceler);
-        eventBus.register(new Subscriber(0, false));
+        eventBus.registerSubscriber(new Subscriber(0, false));
+        eventBus.registerSubscriber(canceler);
+        eventBus.registerSubscriber(new Subscriber(0, false));
         eventBus.post("42");
         assertEquals(1, eventCount.intValue());
 
-        eventBus.unregister(canceler);
+        eventBus.unregisterSubscriber(canceler);
         eventBus.post("42");
         assertEquals(1 + 2, eventCount.intValue());
     }
 
     @Test
     public void testCancelInBetween() {
-        eventBus.register(new Subscriber(2, true));
-        eventBus.register(new Subscriber(1, false));
-        eventBus.register(new Subscriber(3, false));
+        eventBus.registerSubscriber(new Subscriber(2, true));
+        eventBus.registerSubscriber(new Subscriber(1, false));
+        eventBus.registerSubscriber(new Subscriber(3, false));
         eventBus.post("42");
         assertEquals(2, eventCount.intValue());
     }
@@ -62,7 +62,7 @@ public class EventBusCancelEventDeliveryTest extends AbstractEventBusTest {
 
     @Test
     public void testCancelWrongEvent() {
-        eventBus.register(new SubscriberCancelOtherEvent());
+        eventBus.registerSubscriber(new SubscriberCancelOtherEvent());
         eventBus.post("42");
         assertEquals(0, eventCount.intValue());
         assertNotNull(failed);

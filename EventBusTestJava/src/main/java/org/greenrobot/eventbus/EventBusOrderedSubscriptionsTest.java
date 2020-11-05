@@ -63,13 +63,13 @@ public class EventBusOrderedSubscriptionsTest extends AbstractEventBusTest {
 
     protected void runTestOrdered(Object event, boolean sticky, int expectedEventCount) {
         Object subscriber = sticky ? new PrioSubscriberSticky() : new PrioSubscriber();
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
         eventBus.post(event);
 
         waitForEventCount(expectedEventCount, 10000);
         assertEquals(null, fail);
 
-        eventBus.unregister(subscriber);
+        eventBus.unregisterSubscriber(subscriber);
     }
 
     public final class PrioSubscriber {

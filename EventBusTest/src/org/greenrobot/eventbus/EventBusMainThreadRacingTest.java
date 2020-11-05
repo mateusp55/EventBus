@@ -39,7 +39,7 @@ public class EventBusMainThreadRacingTest extends AbstractAndroidEventBusTest {
         Runnable register = new Runnable() {
             @Override
             public void run() {
-                eventBus.register(EventBusMainThreadRacingTest.this);
+                eventBus.registerSubscriber(EventBusMainThreadRacingTest.this);
                 unregistered = false;
             }
         };
@@ -47,7 +47,7 @@ public class EventBusMainThreadRacingTest extends AbstractAndroidEventBusTest {
         Runnable unregister = new Runnable() {
             @Override
             public void run() {
-                eventBus.unregister(EventBusMainThreadRacingTest.this);
+                eventBus.unregisterSubscriber(EventBusMainThreadRacingTest.this);
                 unregistered = true;
             }
         };

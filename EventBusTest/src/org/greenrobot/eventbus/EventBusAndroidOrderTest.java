@@ -30,7 +30,7 @@ public class EventBusAndroidOrderTest extends AbstractAndroidEventBusTest {
 
     @Test
     public void backgroundAndMainUnordered() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
 
         handler.post(new Runnable() {
             @Override
@@ -51,7 +51,7 @@ public class EventBusAndroidOrderTest extends AbstractAndroidEventBusTest {
 
     @Test
     public void backgroundAndMainOrdered() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
 
         handler.post(new Runnable() {
             @Override

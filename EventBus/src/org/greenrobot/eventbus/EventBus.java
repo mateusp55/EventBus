@@ -17,6 +17,7 @@ package org.greenrobot.eventbus;
 
 import android.app.Activity;
 import android.app.Service;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 
@@ -267,11 +268,7 @@ public class EventBus {
         List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
         synchronized (this) {
             for (SubscriberMethod subscriberMethod : subscriberMethods) {
-                try {
-                    subscribe(subscriber, subscriberMethod);
-                } catch(EventBusException e) {
-                    System.out.println("EventBusException: " + e.getMessage());
-                }
+                subscribe(subscriber, subscriberMethod);
             }
         }
 
@@ -293,11 +290,7 @@ public class EventBus {
         List<HandlerMethod> handlerMethods = handlerMethodFinder.findHandlerMethods(handlerClass);
         synchronized (this) {
             for (HandlerMethod handlerMethod : handlerMethods) {
-                try {
-                    handle(handler, handlerMethod);
-                } catch(EventBusException e) {
-                    System.out.println("EventBusException: " + e.getMessage());
-                }
+                handle(handler, handlerMethod);
             }
 
             //Processes the thread that sends the messages that are in the late queue.
@@ -556,7 +549,11 @@ public class EventBus {
     public void post(Object event) {
         synchronized (event) {
             //Register classes with methods mapped as subscribe or handle.
-            registerMappedClasses();
+            try {
+                registerMappedClasses();
+            } catch(NoClassDefFoundError e) {
+                //At the moment, do nothing.
+            }
 
             //Put exceptional events in immediate queue.
             PostingThreadState immediatePostingState = currentImmediatePostingThreadState.get();
@@ -580,7 +577,11 @@ public class EventBus {
     public void throwsException(Object exceptionalEvent) {
         synchronized (exceptionalEvent) {
             //Register classes with methods mapped as subscribe or handle.
-            registerMappedClasses();
+            try {
+                registerMappedClasses();
+            } catch(NoClassDefFoundError e) {
+                //At the moment, do nothing.
+            }
 
             //Put exceptional events in immediate queue.
             ThrowingThreadState immediateThrowingState = currentImmediateThrowingThreadState.get();
@@ -606,8 +607,13 @@ public class EventBus {
 
         mappedClassesRegistrationPerformed = true;
 
+        if(context == null)
+            return;
+
         try {
+            @SuppressLint({"NewApi", "LocalSuppress"})
             DexFile df = new DexFile(context.getPackageCodePath());
+
             for (Enumeration<String> iter = df.entries(); iter.hasMoreElements(); ) {
                 String s = iter.nextElement();
                 if (s.contains(context.getPackageName())) {
@@ -923,6 +929,58 @@ public class EventBus {
     }
 
     public boolean hasSubscriberForEvent(Object event) {
+        return (event == null) ? false : hasSubscriberForEventClass(event.getClass());
+    }
+
+    public boolean hasHandlerForExceptionalEvent(Object exceptionalEvent) {
+        return (exceptionalEvent == null) ? false : hasHandlerForExceptionalEventClass(exceptionalEvent.getClass());
+    }
+
+    public boolean hasSubscriberForEventClass(Class<?> eventClass) {
+        List<Class<?>> eventTypes = lookupAllEventTypes(eventClass);
+        if (eventTypes != null) {
+            int countTypes = eventTypes.size();
+            for (int h = 0; h < countTypes; h++) {
+                Class<?> clazz = eventTypes.get(h);
+                if (hasSubscriptionForEventType(clazz)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasHandlerForExceptionalEventClass(Class<?> exceptionalEventClass) {
+        List<Class<?>> exceptionalEventTypes = lookupAllExceptionalEventTypes(exceptionalEventClass);
+        if (exceptionalEventTypes != null) {
+            int countTypes = exceptionalEventTypes.size();
+            for (int h = 0; h < countTypes; h++) {
+                Class<?> clazz = exceptionalEventTypes.get(h);
+                if (hasHandlementForExceptionalEventType(clazz)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasSubscriptionForEventType(Class<?> eventClass) {
+        CopyOnWriteArrayList<Subscription> subscriptions = null;
+        synchronized (this) {
+            subscriptions = subscriptionsByEventType.get(eventClass);
+            return subscriptions != null && !subscriptions.isEmpty();
+        }
+    }
+
+    private boolean hasHandlementForExceptionalEventType(Class<?> exceptionalEventClass) {
+        CopyOnWriteArrayList<Handlement> handlements = null;
+        synchronized (this) {
+            handlements = handlementsByExceptionalEventType.get(exceptionalEventClass);
+            return handlements != null && !handlements.isEmpty();
+        }
+    }
+
+    public boolean hasSubscriberClassForEvent(Object event) {
         Class<?> eventClass = event.getClass();
         boolean subscriptionFound = false;
         if (eventInheritance) {
@@ -930,19 +988,43 @@ public class EventBus {
             int countTypes = eventTypes.size();
             for (int h = 0; h < countTypes; h++) {
                 Class<?> clazz = eventTypes.get(h);
-                subscriptionFound |= hasSubscriptionForEventType(clazz);
+                subscriptionFound |= hasSubscriptionClassForEventType(clazz);
             }
         } else {
-            subscriptionFound = hasSubscriptionForEventType(eventClass);
+            subscriptionFound = hasSubscriptionClassForEventType(eventClass);
         }
         return subscriptionFound;
     }
 
-    private boolean hasSubscriptionForEventType(Class<?> eventClass) {
-        CopyOnWriteArrayList<Subscription> subscriptions;
+    public boolean hasHandlerClassForExceptionalEvent(Object exceptionalEvent) {
+        Class<?> exceptionalEventClass = exceptionalEvent.getClass();
+        boolean handlementFound = false;
+        if (exceptionalEventInheritance) {
+            List<Class<?>> exceptionalEventTypes = lookupAllExceptionalEventTypes(exceptionalEventClass);
+            int countTypes = exceptionalEventTypes.size();
+            for (int h = 0; h < countTypes; h++) {
+                Class<?> clazz = exceptionalEventTypes.get(h);
+                handlementFound |= hasHandlementClassForExceptionalEventType(clazz);
+            }
+        } else {
+            handlementFound = hasHandlementClassForExceptionalEventType(exceptionalEventClass);
+        }
+        return handlementFound;
+    }
+
+    private boolean hasSubscriptionClassForEventType(Class<?> eventClass) {
+        CopyOnWriteArrayList<SubscriberClass> subscriberClasses;
         synchronized (this) {
-            subscriptions = subscriptionsByEventType.get(eventClass);
-            return subscriptions != null && !subscriptions.isEmpty();
+            subscriberClasses = subscriberClassesByEventType.get(eventClass);
+            return subscriberClasses != null && !subscriberClasses.isEmpty();
+        }
+    }
+
+    private boolean hasHandlementClassForExceptionalEventType(Class<?> exceptionalEventClass) {
+        CopyOnWriteArrayList<HandlerClass> handlerClasses;
+        synchronized (this) {
+            handlerClasses = handlerClassesByExceptionalEventType.get(exceptionalEventClass);
+            return handlerClasses != null && !handlerClasses.isEmpty();
         }
     }
 

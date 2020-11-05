@@ -27,7 +27,7 @@ public class EventBusNoSubscriberEventTest extends AbstractEventBusTest {
 
     @Test
     public void testNoSubscriberEvent() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         eventBus.post("Foo");
         assertEventCount(1);
         assertEquals(NoSubscriberEvent.class, lastEvent.getClass());
@@ -37,18 +37,18 @@ public class EventBusNoSubscriberEventTest extends AbstractEventBusTest {
     }
 
     @Test
-    public void testNoSubscriberEventAfterUnregister() {
+    public void testNoSubscriberEventAfterUnregisterSubscriber() {
         Object subscriber = new DummySubscriber();
-        eventBus.register(subscriber);
-        eventBus.unregister(subscriber);
+        eventBus.registerSubscriber(subscriber);
+        eventBus.unregisterSubscriber(subscriber);
         testNoSubscriberEvent();
     }
 
     @Test
     public void testBadNoSubscriberSubscriber() {
         eventBus = EventBus.builder().logNoSubscriberMessages(false).build();
-        eventBus.register(this);
-        eventBus.register(new BadNoSubscriberSubscriber());
+        eventBus.registerSubscriber(this);
+        eventBus.registerSubscriber(new BadNoSubscriberSubscriber());
         eventBus.post("Foo");
         assertEventCount(2);
 
