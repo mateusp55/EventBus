@@ -59,11 +59,33 @@ public class EventBusAndroidActivityTest extends AbstractEventBusTest {
         assertEquals(event, testActivity.lastStringEvent);
     }
 
+    @Test
+    @UiThreadTest
+    public void testRegisterAndThrowsException() {
+        // Use an activity to test real life performance
+        TestActivity testActivity = new TestActivity();
+        String event = "Hello";
+
+        long start = System.currentTimeMillis();
+        eventBus.registerHandler(testActivity);
+        long time = System.currentTimeMillis() - start;
+        Log.d(EventBus.TAG, "Registered in " + time + "ms");
+
+        eventBus.throwsException(event);
+
+        assertEquals(event, testActivity.lastStringEvent);
+    }
+
     public static class TestActivity extends Activity {
         public String lastStringEvent;
 
         @Subscribe
         public void onEvent(String event) {
+            lastStringEvent = event;
+        }
+
+        @Handle
+        public void onException(String event) {
             lastStringEvent = event;
         }
     }
