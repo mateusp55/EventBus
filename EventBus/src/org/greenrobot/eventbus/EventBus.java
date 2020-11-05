@@ -475,8 +475,12 @@ public class EventBus {
         return mainThreadSupport == null || mainThreadSupport.isMainThread();
     }
 
-    public synchronized boolean isRegistered(Object subscriber) {
+    public synchronized boolean isSubscriberRegistered(Object subscriber) {
         return typesBySubscriber.containsKey(subscriber);
+    }
+
+    public synchronized boolean isHandlerRegistered(Object handler) {
+        return typesByHandler.containsKey(handler);
     }
 
     /** Only updates subscriptionsByEventType, not typesBySubscriber! Caller must update typesBySubscriber. */
