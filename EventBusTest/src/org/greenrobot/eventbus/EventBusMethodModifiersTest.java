@@ -59,4 +59,35 @@ public class EventBusMethodModifiersTest extends AbstractAndroidEventBusTest {
         assertNotSame(Looper.getMainLooper(), Looper.myLooper());
     }
 
+    @Test
+    public void testRegisterForEventTypeAndThrowsException() throws InterruptedException {
+        eventBus.registerHandler(this);
+        String event = "Hello";
+        eventBus.throwsException(event);
+        waitForEventCount(4, 1000);
+    }
+
+    @Handle
+    public void onThrowsException(String event) {
+        trackEvent(event);
+        assertNotSame(Looper.getMainLooper(), Looper.myLooper());
+    }
+
+    @Handle(threadMode = ExceptionalThreadMode.MAIN)
+    public void onThrowsExceptionMainThread(String event) {
+        trackEvent(event);
+        assertSame(Looper.getMainLooper(), Looper.myLooper());
+    }
+
+    @Handle(threadMode = ExceptionalThreadMode.BACKGROUND)
+    public void onThrowsExceptionBackgroundThread(String event) {
+        trackEvent(event);
+        assertNotSame(Looper.getMainLooper(), Looper.myLooper());
+    }
+
+    @Handle(threadMode = ExceptionalThreadMode.ASYNC)
+    public void onThrowsExceptionAsync(String event) {
+        trackEvent(event);
+        assertNotSame(Looper.getMainLooper(), Looper.myLooper());
+    }
 }
