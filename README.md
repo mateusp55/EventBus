@@ -43,14 +43,6 @@ EventBus (Normal Flow) in 3 steps
     }
    
     @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregisterSubscriber(this);
-    }
-   
-   or
- 
-    @Override
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregisterSubscriber(this);
@@ -111,14 +103,6 @@ EventBus (Exceptional Flow) in 3 steps
         super.onStart();
         EventBus.getDefault().registerHandler(this);
     }
- 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregisterHandler(this);
-    }
-   
-   or
  
     @Override
     public void onDestroy() {
