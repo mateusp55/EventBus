@@ -100,11 +100,11 @@ public class EventBusBasicTest extends AbstractEventBusTest {
 
     @Test
     public void testIsRegistered() {
-        assertFalse(eventBus.isRegistered(this));
+        assertFalse(eventBus.isSubscriberRegistered(this));
         eventBus.registerSubscriber(this);
-        assertTrue(eventBus.isRegistered(this));
+        assertTrue(eventBus.isSubscriberRegistered(this));
         eventBus.unregisterSubscriber(this);
-        assertFalse(eventBus.isRegistered(this));
+        assertFalse(eventBus.isSubscriberRegistered(this));
     }
 
     @Test
