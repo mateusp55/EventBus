@@ -31,7 +31,7 @@ public class EventBusAndroidCancelEventDeliveryTest extends EventBusCancelEventD
     @Test
     public void testCancelInMainThread() {
         SubscriberMainThread subscriber = new SubscriberMainThread();
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
         eventBus.post("42");
         awaitLatch(subscriber.done, 10);
         assertEquals(0, eventCount.intValue());

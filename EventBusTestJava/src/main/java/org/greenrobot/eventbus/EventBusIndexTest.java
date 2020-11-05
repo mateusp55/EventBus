@@ -42,9 +42,9 @@ public class EventBusIndexTest {
         };
 
         EventBus eventBus = EventBus.builder().addIndex(index).build();
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         eventBus.post("Yepp");
-        eventBus.unregister(this);
+        eventBus.unregisterSubscriber(this);
         Assert.assertEquals("Yepp", value);
     }
 

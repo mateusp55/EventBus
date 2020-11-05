@@ -28,7 +28,7 @@ public class EventBusSubscriberExceptionTest extends AbstractEventBusTest {
     @Test
     public void testSubscriberExceptionEvent() {
         eventBus = EventBus.builder().logSubscriberExceptions(false).build();
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         eventBus.post("Foo");
         assertEventCount(1);
         assertEquals(SubscriberExceptionEvent.class, lastEvent.getClass());
@@ -41,8 +41,8 @@ public class EventBusSubscriberExceptionTest extends AbstractEventBusTest {
     @Test
     public void testBadExceptionSubscriber() {
         eventBus = EventBus.builder().logSubscriberExceptions(false).build();
-        eventBus.register(this);
-        eventBus.register(new BadExceptionSubscriber());
+        eventBus.registerSubscriber(this);
+        eventBus.registerSubscriber(new BadExceptionSubscriber());
         eventBus.post("Foo");
         assertEventCount(1);
     }

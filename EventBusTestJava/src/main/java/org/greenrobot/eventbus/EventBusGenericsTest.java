@@ -50,7 +50,7 @@ public class EventBusGenericsTest extends AbstractEventBusTest {
     @Test
     public void testGenericEventAndSubscriber() {
         GenericEventSubscriber<IntTestEvent> genericSubscriber = new GenericEventSubscriber<IntTestEvent>();
-        eventBus.register(genericSubscriber);
+        eventBus.registerSubscriber(genericSubscriber);
         eventBus.post(new GenericEvent<Integer>());
         assertEventCount(1);
     }
@@ -58,7 +58,7 @@ public class EventBusGenericsTest extends AbstractEventBusTest {
     @Test
     public void testGenericEventAndSubscriber_TypeErasure() {
         FullGenericEventSubscriber<IntTestEvent> genericSubscriber = new FullGenericEventSubscriber<IntTestEvent>();
-        eventBus.register(genericSubscriber);
+        eventBus.registerSubscriber(genericSubscriber);
         eventBus.post(new IntTestEvent(42));
         eventBus.post("Type erasure!");
         assertEventCount(2);
@@ -67,7 +67,7 @@ public class EventBusGenericsTest extends AbstractEventBusTest {
     @Test
     public void testGenericEventAndSubscriber_BaseType() {
         GenericNumberEventSubscriber<Float> genericSubscriber = new GenericNumberEventSubscriber<>();
-        eventBus.register(genericSubscriber);
+        eventBus.registerSubscriber(genericSubscriber);
         eventBus.post(new Float(42));
         eventBus.post(new Double(23));
         assertEventCount(2);
@@ -78,7 +78,7 @@ public class EventBusGenericsTest extends AbstractEventBusTest {
     @Test
     public void testGenericEventAndSubscriber_Subclass() {
         GenericFloatEventSubscriber genericSubscriber = new GenericFloatEventSubscriber();
-        eventBus.register(genericSubscriber);
+        eventBus.registerSubscriber(genericSubscriber);
         eventBus.post(new Float(42));
         eventBus.post(new Double(77));
         assertEventCount(2);

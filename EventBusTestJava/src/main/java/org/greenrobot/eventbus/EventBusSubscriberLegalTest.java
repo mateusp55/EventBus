@@ -26,16 +26,16 @@ public class EventBusSubscriberLegalTest extends AbstractEventBusTest {
 
     @Test
     public void testSubscriberLegal() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         eventBus.post("42");
-        eventBus.unregister(this);
+        eventBus.unregisterSubscriber(this);
         assertEquals(1, eventCount.intValue());
     }
 
     // With build time verification, some of these tests are obsolete (and cause problems during build)
 //    public void testSubscriberNotPublic() {
 //        try {
-//            eventBus.register(new NotPublic());
+//            eventBus.registerSubscriber(new NotPublic());
 //            fail("Registration of ilegal subscriber successful");
 //        } catch (EventBusException e) {
 //            // Expected
@@ -44,7 +44,7 @@ public class EventBusSubscriberLegalTest extends AbstractEventBusTest {
 
 //    public void testSubscriberStatic() {
 //        try {
-//            eventBus.register(new Static());
+//            eventBus.registerSubscriber(new Static());
 //            fail("Registration of ilegal subscriber successful");
 //        } catch (EventBusException e) {
 //            // Expected
@@ -52,7 +52,7 @@ public class EventBusSubscriberLegalTest extends AbstractEventBusTest {
 //    }
 
     public void testSubscriberLegalAbstract() {
-        eventBus.register(new AbstractImpl());
+        eventBus.registerSubscriber(new AbstractImpl());
 
         eventBus.post("42");
         assertEquals(1, eventCount.intValue());

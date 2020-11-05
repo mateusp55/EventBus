@@ -52,7 +52,7 @@ public class EventBusBasicTest extends AbstractEventBusTest {
         String event = "Hello";
 
         long start = System.currentTimeMillis();
-        eventBus.register(stringEventSubscriber);
+        eventBus.registerSubscriber(stringEventSubscriber);
         long time = System.currentTimeMillis() - start;
         log("Registered in " + time + "ms");
 
@@ -69,7 +69,7 @@ public class EventBusBasicTest extends AbstractEventBusTest {
     @Test
     public void testUnregisterWithoutRegister() {
         // Results in a warning without throwing
-        eventBus.unregister(this);
+        eventBus.unregisterSubscriber(this);
     }
 
     // This will throw "out of memory" if subscribers are leaked
@@ -81,17 +81,17 @@ public class EventBusBasicTest extends AbstractEventBusTest {
             EventBusBasicTest subscriber = new EventBusBasicTest() {
                 byte[] expensiveObject = new byte[1024 * 1024];
             };
-            eventBus.register(subscriber);
-            eventBus.unregister(subscriber);
+            eventBus.registerSubscriber(subscriber);
+            eventBus.unregisterSubscriber(subscriber);
             log("Iteration " + i + " / max heap: " + heapMBytes);
         }
     }
 
     @Test
     public void testRegisterTwice() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         try {
-            eventBus.register(this);
+            eventBus.registerSubscriber(this);
             fail("Did not throw");
         } catch (RuntimeException expected) {
             // OK
@@ -101,17 +101,17 @@ public class EventBusBasicTest extends AbstractEventBusTest {
     @Test
     public void testIsRegistered() {
         assertFalse(eventBus.isRegistered(this));
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         assertTrue(eventBus.isRegistered(this));
-        eventBus.unregister(this);
+        eventBus.unregisterSubscriber(this);
         assertFalse(eventBus.isRegistered(this));
     }
 
     @Test
     public void testPostWithTwoSubscriber() {
         EventBusBasicTest test2 = new EventBusBasicTest();
-        eventBus.register(this);
-        eventBus.register(test2);
+        eventBus.registerSubscriber(this);
+        eventBus.registerSubscriber(test2);
         String event = "Hello";
         eventBus.post(event);
         assertEquals(event, lastStringEvent);
@@ -120,7 +120,7 @@ public class EventBusBasicTest extends AbstractEventBusTest {
 
     @Test
     public void testPostMultipleTimes() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         MyEvent event = new MyEvent();
         int count = 1000;
         long start = System.currentTimeMillis();
@@ -136,7 +136,7 @@ public class EventBusBasicTest extends AbstractEventBusTest {
 
     @Test
     public void testMultipleSubscribeMethodsForEvent() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         MyEvent event = new MyEvent();
         eventBus.post(event);
         assertEquals(1, countMyEvent);
@@ -144,16 +144,16 @@ public class EventBusBasicTest extends AbstractEventBusTest {
     }
 
     @Test
-    public void testPostAfterUnregister() {
-        eventBus.register(this);
-        eventBus.unregister(this);
+    public void testPostAfterUnregisterSubscriber() {
+        eventBus.registerSubscriber(this);
+        eventBus.unregisterSubscriber(this);
         eventBus.post("Hello");
         assertNull(lastStringEvent);
     }
 
     @Test
     public void testRegisterAndPostTwoTypes() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         eventBus.post(42);
         eventBus.post("Hello");
         assertEquals(1, countIntEvent);
@@ -164,8 +164,8 @@ public class EventBusBasicTest extends AbstractEventBusTest {
 
     @Test
     public void testRegisterUnregisterAndPostTwoTypes() {
-        eventBus.register(this);
-        eventBus.unregister(this);
+        eventBus.registerSubscriber(this);
+        eventBus.unregisterSubscriber(this);
         eventBus.post(42);
         eventBus.post("Hello");
         assertEquals(0, countIntEvent);
@@ -175,7 +175,7 @@ public class EventBusBasicTest extends AbstractEventBusTest {
 
     @Test
     public void testPostOnDifferentEventBus() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
         new EventBus().post("Hello");
         assertEquals(0, countStringEvent);
     }
@@ -183,8 +183,8 @@ public class EventBusBasicTest extends AbstractEventBusTest {
     @Test
     public void testPostInEventHandler() {
         RepostInteger reposter = new RepostInteger();
-        eventBus.register(reposter);
-        eventBus.register(this);
+        eventBus.registerSubscriber(reposter);
+        eventBus.registerSubscriber(this);
         eventBus.post(1);
         assertEquals(10, countIntEvent);
         assertEquals(10, lastIntEvent);
@@ -194,39 +194,39 @@ public class EventBusBasicTest extends AbstractEventBusTest {
 
     @Test
     public void testHasSubscriberForEvent() {
-        assertFalse(eventBus.hasSubscriberForEvent(String.class));
+        assertFalse(eventBus.hasSubscriberForEventClass(String.class));
 
-        eventBus.register(this);
-        assertTrue(eventBus.hasSubscriberForEvent(String.class));
+        eventBus.registerSubscriber(this);
+        assertTrue(eventBus.hasSubscriberForEventClass(String.class));
 
-        eventBus.unregister(this);
-        assertFalse(eventBus.hasSubscriberForEvent(String.class));
+        eventBus.unregisterSubscriber(this);
+        assertFalse(eventBus.hasSubscriberForEventClass(String.class));
     }
 
     @Test
     public void testHasSubscriberForEventSuperclass() {
-        assertFalse(eventBus.hasSubscriberForEvent(String.class));
+        assertFalse(eventBus.hasSubscriberForEventClass(String.class));
 
         Object subscriber = new ObjectSubscriber();
-        eventBus.register(subscriber);
-        assertTrue(eventBus.hasSubscriberForEvent(String.class));
+        eventBus.registerSubscriber(subscriber);
+        assertTrue(eventBus.hasSubscriberForEventClass(String.class));
 
-        eventBus.unregister(subscriber);
-        assertFalse(eventBus.hasSubscriberForEvent(String.class));
+        eventBus.unregisterSubscriber(subscriber);
+        assertFalse(eventBus.hasSubscriberForEventClass(String.class));
     }
 
     @Test
     public void testHasSubscriberForEventImplementedInterface() {
-        assertFalse(eventBus.hasSubscriberForEvent(String.class));
+        assertFalse(eventBus.hasSubscriberForEventClass(String.class));
 
         Object subscriber = new CharSequenceSubscriber();
-        eventBus.register(subscriber);
-        assertTrue(eventBus.hasSubscriberForEvent(CharSequence.class));
-        assertTrue(eventBus.hasSubscriberForEvent(String.class));
+        eventBus.registerSubscriber(subscriber);
+        assertTrue(eventBus.hasSubscriberForEventClass(CharSequence.class));
+        assertTrue(eventBus.hasSubscriberForEventClass(String.class));
 
-        eventBus.unregister(subscriber);
-        assertFalse(eventBus.hasSubscriberForEvent(CharSequence.class));
-        assertFalse(eventBus.hasSubscriberForEvent(String.class));
+        eventBus.unregisterSubscriber(subscriber);
+        assertFalse(eventBus.hasSubscriberForEventClass(CharSequence.class));
+        assertFalse(eventBus.hasSubscriberForEventClass(String.class));
     }
 
     @Subscribe

@@ -62,14 +62,14 @@ public class EventBusAndroidMultithreadedTest extends EventBusMultithreadedTest 
         public void run() {
             try {
                 while (running) {
-                    eventBus.register(this);
+                    eventBus.registerSubscriber(this);
                     double random = Math.random();
                     if (random > 0.6d) {
                         Thread.sleep(0, (int) (1000000 * Math.random()));
                     } else if (random > 0.3d) {
                         Thread.yield();
                     }
-                    eventBus.unregister(this);
+                    eventBus.unregisterSubscriber(this);
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

@@ -40,7 +40,7 @@ public class EventBusInheritanceDisabledTest {
 
     @Test
     public void testEventClassHierarchy() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
 
         eventBus.post("Hello");
         assertEquals(0, countObjectEvent);
@@ -60,7 +60,7 @@ public class EventBusInheritanceDisabledTest {
         eventBus.postSticky("Hello");
         eventBus.postSticky(new MyEvent());
         eventBus.postSticky(new MyEventExtended());
-        eventBus.register(new StickySubscriber());
+        eventBus.registerSubscriber(new StickySubscriber());
         assertEquals(1, countMyEventExtended);
         assertEquals(1, countMyEvent);
         assertEquals(0, countObjectEvent);
@@ -68,7 +68,7 @@ public class EventBusInheritanceDisabledTest {
 
     @Test
     public void testEventInterfaceHierarchy() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
 
         eventBus.post(new MyEvent());
         assertEquals(0, countMyEventInterface);
@@ -80,7 +80,7 @@ public class EventBusInheritanceDisabledTest {
 
     @Test
     public void testEventSuperInterfaceHierarchy() {
-        eventBus.register(this);
+        eventBus.registerSubscriber(this);
 
         eventBus.post(new MyEventInterfaceExtended() {
         });
@@ -92,7 +92,7 @@ public class EventBusInheritanceDisabledTest {
     public void testSubscriberClassHierarchy() {
         EventBusInheritanceDisabledSubclassTest
                 subscriber = new EventBusInheritanceDisabledSubclassTest();
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
 
         eventBus.post("Hello");
         assertEquals(0, subscriber.countObjectEvent);
@@ -113,7 +113,7 @@ public class EventBusInheritanceDisabledTest {
     public void testSubscriberClassHierarchyWithoutNewSubscriberMethod() {
         EventBusInheritanceDisabledSubclassNoMethod
                 subscriber = new EventBusInheritanceDisabledSubclassNoMethod();
-        eventBus.register(subscriber);
+        eventBus.registerSubscriber(subscriber);
 
         eventBus.post("Hello");
         assertEquals(0, subscriber.countObjectEvent);

@@ -50,7 +50,7 @@ public class EventBusAndroidActivityTest extends AbstractEventBusTest {
         String event = "Hello";
 
         long start = System.currentTimeMillis();
-        eventBus.register(testActivity);
+        eventBus.registerSubscriber(testActivity);
         long time = System.currentTimeMillis() - start;
         Log.d(EventBus.TAG, "Registered in " + time + "ms");
 
