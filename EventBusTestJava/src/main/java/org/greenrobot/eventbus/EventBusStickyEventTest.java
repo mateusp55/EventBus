@@ -22,28 +22,28 @@ import static org.junit.Assert.*;
 /**
  * @author Markus Junginger, greenrobot
  */
-public class EventBusStickyEventTest extends AbstractEventBusTest {
+public class EventBusStickyThrowsExceptionTest extends AbstractEventBusTest {
 
     @Test
-    public void testPostSticky() throws InterruptedException {
-        eventBus.postSticky("Sticky");
+    public void testThrowsSticky() throws InterruptedException {
+        eventBus.throwsSticky("Sticky");
         eventBus.register(this);
         assertEquals("Sticky", lastEvent);
         assertEquals(Thread.currentThread(), lastThread);
     }
 
     @Test
-    public void testPostStickyTwoEvents() throws InterruptedException {
-        eventBus.postSticky("Sticky");
-        eventBus.postSticky(new IntTestEvent(7));
+    public void testThrowsStickyTwoEvents() throws InterruptedException {
+        eventBus.throwsSticky("Sticky");
+        eventBus.throwsSticky(new IntTestEvent(7));
         eventBus.register(this);
         assertEquals(2, eventCount.intValue());
     }
 
     @Test
-    public void testPostStickyTwoSubscribers() throws InterruptedException {
-        eventBus.postSticky("Sticky");
-        eventBus.postSticky(new IntTestEvent(7));
+    public void testThrowsStickyTwoSubscribers() throws InterruptedException {
+        eventBus.throwsSticky("Sticky");
+        eventBus.throwsSticky(new IntTestEvent(7));
         eventBus.register(this);
         StickyIntTestSubscriber subscriber2 = new StickyIntTestSubscriber();
         eventBus.register(subscriber2);
@@ -55,7 +55,6 @@ public class EventBusStickyEventTest extends AbstractEventBusTest {
         eventBus.postSticky(new IntTestEvent(8));
         assertEquals(6, eventCount.intValue());
     }
-
     @Test
     public void testPostStickyRegisterNonSticky() throws InterruptedException {
         eventBus.postSticky("Sticky");
