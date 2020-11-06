@@ -73,8 +73,8 @@ public class EventBusStickyThrowsExceptionTest extends AbstractEventBusTest {
 
     @Test
     public void testPostStickyTwice() throws InterruptedException {
-        eventBus.postSticky("Sticky");
-        eventBus.postSticky("NewSticky");
+        eventBus.throwsSticky("Sticky");
+        eventBus.throwsSticky("NewSticky");
         eventBus.register(this);
         assertEquals("NewSticky", lastEvent);
     }
