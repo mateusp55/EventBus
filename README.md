@@ -1,12 +1,28 @@
 EventBus
 ========
 [EventBus](https://greenrobot.org/eventbus/) is a publish/subscribe event bus for Android and Java.<br/>
-<img src="EventBus-PubSub-ExceptionHandling.png" width="100%"/>
+
 
 [![Build Status](https://travis-ci.org/greenrobot/EventBus.svg?branch=master)](https://travis-ci.org/greenrobot/EventBus)
 [![Follow greenrobot on Twitter](https://img.shields.io/twitter/follow/greenrobot_de.svg?style=flat-square&logo=twitter)](https://twitter.com/greenrobot_de)
 
+Index
+-----------------
+
+- [Normal Flow in 3 steps](#normal-flow-in-3-steps)
+- [Exceptional Flow in 3 steps](#exceptional-flow-in-3-steps)
+- [Add EventBus to your project](#add-eventbus-to-your-project)
+- [R8 or ProGuard](#r8-or-proguard)
+- [Homepage, Documentation, Links](#documentation-and-links)
+- [License](#license)
+
+-----------------
+
+
+
+
 EventBus...
+-----------------
 
  * simplifies the communication between components
     * decouples event senders and receivers
@@ -18,8 +34,10 @@ EventBus...
  * is proven in practice by apps with 1,000,000,000+ installs
  * has advanced features like delivery threads, subscriber priorities, etc.
 
-EventBus (Normal Flow) in 3 steps
--------------------
+<img src="EventBus-PubSub-ExceptionHandling.png" width="100%"/>
+
+Normal Flow in 3 steps
+-----------------
 1. Define events:
 
     ```java  
@@ -80,8 +98,9 @@ EventBus (Normal Flow) in 3 steps
     EventBus.getDefault().post(new MessageEvent());
     ```
 
-EventBus (Exceptional Flow) in 3 steps
--------------------
+Exceptional Flow in 3 steps
+-----------------
+
 1. Define exceptional events:
 
     ```java  
@@ -150,7 +169,7 @@ There are also some [examples](https://github.com/greenrobot-team/greenrobot-exa
 This will avoid some reflection related problems seen in the wild.  
 
 Add EventBus to your project
-----------------------------
+-----------------
 
 Via Gradle:
 ```gradle
@@ -182,8 +201,8 @@ Via Maven:
 </dependency>
 ```
 
-R8, ProGuard
-------------
+R8 or ProGuard
+-----------------
 
 If your project uses R8 or ProGuard add the following rules:
 
@@ -200,8 +219,9 @@ If your project uses R8 or ProGuard add the following rules:
 }
 ```
 
-Homepage, Documentation, Links
-------------------------------
+Documentation and Links
+-----------------
+
 For more details please check the [EventBus website](https://greenrobot.org/eventbus). Here are some direct links you may find useful:
 
 [Features](https://greenrobot.org/eventbus/features/)
@@ -215,13 +235,15 @@ For more details please check the [EventBus website](https://greenrobot.org/even
 How does EventBus compare to other solutions, like Otto from Square? Check this [comparison](COMPARISON.md).
 
 License
--------
+-----------------
+
 Copyright (C) 2012-2020 Markus Junginger, greenrobot (https://greenrobot.org)
 
 EventBus binaries and source code can be used according to the [Apache License, Version 2.0](LICENSE).
 
+
 Other projects by greenrobot
-============================
+---------------
 [__ObjectBox__](https://objectbox.io/) ([GitHub](https://github.com/objectbox/objectbox-java)) is a new superfast object-oriented database.
 
 [__Essentials__](https://github.com/greenrobot/essentials) is a set of utility classes and hash functions for Android & Java projects.
